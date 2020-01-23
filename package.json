@@ -1,6 +1,6 @@
 {
   "name": "gdpr-cookie-consent-banner",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A full featured cookie consent plugin which meets GDPR and other requirements.",
   "keywords": [
     "cookie",
@@ -26,10 +26,8 @@
     "start": "npm run watch",
     "watch": "microbundle --name CookieConsent watch",
     "build": "microbundle --name CookieConsent",
-    "docs-build": "microbundle -f umd -o docs/dist/cookie-consent.umd.js --name CookieConsent --no-sourcemap",
-    "docs-watch": "microbundle -f umd -o docs/dist/cookie-consent.umd.js --name CookieConsent --watch",
     "prepublishOnly": "npm run build",
-    "serve": "serve docs"
+    "serve": "serve ."
   },
   "devDependencies": {
     "eslint": "^6.8.0",
