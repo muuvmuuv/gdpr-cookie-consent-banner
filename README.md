@@ -5,10 +5,6 @@
 A full featured, small (8K) and easy to use library to show a cookie consent banner on
 your website. It is fully tested and GDPR ready.
 
-In use by this companies/people:
-
-- [ADDITIVE GmbH](https://www.additive-net.de/de/)
-
 - [How it works](#how-it-works)
 - [Installation](#installation)
 - [How to use](#how-to-use)
@@ -16,6 +12,11 @@ In use by this companies/people:
   - [Options](#options)
     - [Label](#label)
 - [Advanced](#advanced)
+
+In use by this companies/people:
+
+- [ADDITIVE GmbH](https://www.additive-net.de/de/)
+- Open an issue, if you want to get added.
 
 ## How it works
 
@@ -135,8 +136,8 @@ window.consent = new CookieConsent()
 
 ## Advanced
 
-Make sure you had a look at our [demo](https://muuvmuuv.github.io/cookie-consent/), demo
-and the [options section](#options) files before continueing.
+Have a look at our [demo](https://muuvmuuv.github.io/cookie-consent/), the [docs](./docs)
+and the [options section](#options) files before going further.
 
 Every function holds the initiated consent class, so you can use every function inside
 [./src/consent.js](./src/consent.js).
