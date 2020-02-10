@@ -15,8 +15,9 @@
   --cookieconsent-green: #09b309;
 }
 
-.cookieconsent,
+.cookiebanner,
 .cookienotice {
+  visibility: hidden;
   position: fixed;
   z-index: 20;
   bottom: 20px;
@@ -29,11 +30,12 @@
   user-select: none;
 
   &.visible {
+    visibility: visible;
     opacity: 1;
   }
 }
 
-.cookieconsent {
+.cookiebanner {
   width: 100%;
   max-width: 400px;
   height: auto;
@@ -107,6 +109,7 @@
       color: var(--cookieconsent-color);
       font-weight: bold;
       text-align: center;
+      cursor: pointer;
 
       @include noReducedMotion() {
         transition: opacity 140ms ease-in;
@@ -129,9 +132,9 @@
 }
 
 .cookienotice {
-  width: 50px;
-  height: auto;
-  padding: 7px;
+  width: 45px;
+  height: 45px;
+  padding: 10px;
   cursor: pointer;
 
   @include noReducedMotion() {

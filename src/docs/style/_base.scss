@@ -1,0 +1,9 @@
+body {
+  padding: var(--spacing-xxl) var(--spacing-lg);
+  background: var(--color-light);
+}
+
+hr {
+  border-top: 0;
+  border-bottom-color: var(--color-primary-light);
+}

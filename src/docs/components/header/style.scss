@@ -1,0 +1,14 @@
+header {
+  text-align: center;
+
+  h1 a {
+    color: var(--color-primary);
+    font-family: var(--font-serif);
+    text-decoration: none;
+  }
+
+  .badges img {
+    margin: 0 var(--spacing-xxs);
+    user-select: none;
+  }
+}
