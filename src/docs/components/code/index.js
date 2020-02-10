@@ -22,7 +22,7 @@ const renderTokens = (tokens, getLineProps, getTokenProps) => {
       </div>
     )
 
-    linesNumbered.push(<div key={i}>{i}</div>)
+    linesNumbered.push(<div key={i}>{i + 1}</div>)
   })
 
   return { linesTokened, linesNumbered }

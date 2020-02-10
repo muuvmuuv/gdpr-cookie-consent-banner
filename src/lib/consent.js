@@ -2,43 +2,43 @@ import { prefersReducedMotion } from './accessibility'
 import { getCookie, setCookie, removeCookie } from './cookie'
 
 const Event = {
+  ON_UPDATE: 'onUpdate',
+  ON_VALUE_CHANGED: 'onValueChange',
   ON_ACCEPT: 'onAccept',
   ON_REJECT: 'onReject',
-  ON_UPDATE: 'onUpdate',
-  ON_VALUE_CHANGED: 'onValueChanged',
 }
 
 export default class CookieConsent {
   constructor(options) {
     const defaultOptions = {
+      debug: false,
       name: 'cookie-consent',
       banner: document.getElementById('cookiebanner'),
       notice: document.getElementById('cookienotice'),
-      labels: [
+      capabilities: [
         {
           name: 'functional',
           checked: true,
           onReject: (consent) => {
-            consent.removeCookieOptions()
+            consent.removeUserOptions()
+            window.location.reload()
           },
           onAccept: (consent) => {
             const choices = consent.getChoices()
-            consent.saveCookieOptions({ choices, consented: true })
-          },
-          onUpdate: (_, { choice }) => {
-            console.log('Functional now:', choice)
+            consent.saveUserOptions({ choices, consented: true })
           },
         },
       ],
     }
 
     this.options = { ...defaultOptions, ...options }
+    this.queue = [] // this will hold event hooks to run in order
 
     // console.log(this.options)
 
     if (!this.options.banner || !this.options.notice) {
       console.error('Can not find required elements!')
-      return undefined // no banner or notice present
+      return // no banner or notice present
     }
 
     this.button = {}
@@ -52,13 +52,13 @@ export default class CookieConsent {
 
     this.initEvents()
 
-    const content = this.loadCookieOptions()
+    const content = this.loadUserOptions()
 
     // console.log(JSON.stringify(content, null, 2))
 
     if (content && content.choices) {
       this.setChoices(content.choices)
-      this.runEventCircle(content.choices)
+      this.initStartUpEvents()
     } else {
       this.initFields()
     }
@@ -70,8 +70,13 @@ export default class CookieConsent {
     }
   }
 
+  /**
+   * Sync form input fields with capabilities .
+   *
+   * @returns {Choice[]} passed choices
+   */
   initFields() {
-    const choices = this.options.labels.map(({ name, checked }) => ({
+    const choices = this.options.capabilities.map(({ name, checked }) => ({
       name: name,
       value: checked,
     }))
@@ -79,65 +84,128 @@ export default class CookieConsent {
     return choices
   }
 
+  /**
+   * Initial all element events.
+   */
   initEvents() {
-    // TODO: add `onValueChange` => reload if one value is rejected
-
+    // Reject
     this.button.reject.addEventListener('click', () => {
-      const choices = this.initFields() // reset
-      this.saveCookieOptions({ choices, consented: false })
-      this.runEventsFor(choices, Event.ON_REJECT)
-      window.location.reload()
-    })
-
-    this.button.accept.addEventListener('click', () => {
-      const choices = this.getChoices()
-      this.runEventCircle(choices)
+      if (this.options.debug) console.time('reject')
+      const choices = this.initFields()
+      choices.forEach((choice) => {
+        const capability = this.getCapability(choice.name)
+        this._runValueEventsFor(capability, choice)
+        this._runEventFor(capability, Event.ON_REJECT)
+      })
+      this._startRunner()
+      if (this.options.debug) console.timeEnd('reject')
       this.hideElement(this.options.banner)
       setTimeout(() => {
         this.showElement(this.options.notice)
       }, 160)
     })
 
+    // Accept
+    this.button.accept.addEventListener('click', () => {
+      if (this.options.debug) console.time('accept')
+      const choices = this.getChoices()
+      choices.forEach((choice) => {
+        const capability = this.getCapability(choice.name)
+        this._runValueEventsFor(capability, choice)
+        this._runEventFor(capability, Event.ON_ACCEPT)
+      })
+      this._startRunner()
+      if (this.options.debug) console.timeEnd('accept')
+      this.hideElement(this.options.banner)
+      setTimeout(() => {
+        this.showElement(this.options.notice)
+      }, 160)
+    })
+
+    // Show banner
     this.options.notice.addEventListener('click', () => {
-      this.saveCookieOptions({ consented: false })
       this.hideElement(this.options.notice)
       this.showElement(this.options.banner)
     })
   }
 
-  loadCookieOptions() {
+  /**
+   * On first load fire these events.
+   */
+  initStartUpEvents() {
+    const choices = this.getChoices()
+    choices.forEach((choice) => {
+      const capability = this.getCapability(choice.name)
+      if (choice.value) {
+        // is checked
+        this._runEventFor(capability, Event.ON_ACCEPT)
+      } else {
+        this._runEventFor(capability, Event.ON_REJECT)
+      }
+      this._startRunner()
+    })
+  }
+
+  /**
+   * Get our plugin options cookies content.
+   */
+  loadUserOptions() {
     const content = getCookie(this.options.name)
-    if (!content) return {}
+    if (!content) return null
     return content
   }
 
-  saveCookieOptions(saveThis) {
+  /**
+   * Save something to our plugin options cookie.
+   *
+   * @param {object} saveThis
+   */
+  saveUserOptions(saveThis) {
     const oldContent = getCookie(this.options.name)
     const newContent = { ...oldContent, ...saveThis }
     setCookie(this.options.name, newContent)
   }
 
-  removeCookieOptions() {
+  /**
+   * Delete all plugin options that are saved into a cookie.
+   */
+  removeUserOptions() {
     if (getCookie(this.options.name)) {
       removeCookie(this.options.name)
     }
   }
 
+  /**
+   * Get single form input choice by its input name.
+   *
+   * @param {string} byName
+   */
   getChoice(byName) {
     const node = this.options.banner.querySelector(`.choice [name="choice:${byName}"]`)
+
     return node.checked
   }
 
+  /**
+   * Get form input choices.
+   */
   getChoices() {
-    const choices = []
+    let choices = []
+
     this.options.banner.querySelectorAll('.choice input').forEach((node) => {
       const name = node.getAttribute('name').replace('choice:', '')
       const value = node.checked
       choices.push({ name, value })
     })
+
     return choices
   }
 
+  /**
+   * Set form input choices. Most likely for reseting the form.
+   *
+   * @param {Choice[]} choices
+   */
   setChoices(choices) {
     this.options.banner.querySelectorAll('.choice input').forEach((node) => {
       const name = node.getAttribute('name').replace('choice:', '')
@@ -148,6 +216,20 @@ export default class CookieConsent {
     })
   }
 
+  /**
+   * Get capability by name.
+   *
+   * @param {string} name
+   */
+  getCapability(name) {
+    return this.options.capabilities.find((c) => c.name === name)
+  }
+
+  /**
+   * Smoothly show an element.
+   *
+   * @param {HTMLElement} element
+   */
   showElement(element) {
     if ('animate' in element && !prefersReducedMotion()) {
       element
@@ -164,6 +246,11 @@ export default class CookieConsent {
     }
   }
 
+  /**
+   * Smoothly hide an element.
+   *
+   * @param {HTMLElement} element
+   */
   hideElement(element) {
     if ('animate' in element && !prefersReducedMotion()) {
       element
@@ -180,36 +267,82 @@ export default class CookieConsent {
     }
   }
 
-  runEventFor(handler, withEvent) {
-    if (handler) {
-      if (handler[withEvent]) {
-        handler[withEvent](this)
-      }
+  /**
+   * Add a callable event function to an queue.
+   *
+   * @param {string} name
+   * @param {function} func
+   */
+  _addToQueue(name, func) {
+    this.queue.push({ name, func })
+  }
 
-      if (handler[Event.ON_UPDATE]) {
-        const params = {
-          choice: this.getChoice(handler.name),
-        }
-        handler[Event.ON_UPDATE](this, params)
+  /**
+   * Run the callable event queue.
+   */
+  _startRunner() {
+    // loop event by order
+    Object.values(Event).forEach((event) => {
+      // find callables from queue with event name
+      const callables = this.queue.filter((q) => q.name === event)
+      // call them
+      callables.forEach(({ func }) => func())
+    })
+    this.queue = [] // clear queue for new operations
+  }
+
+  /**
+   * Run one event for one capability.
+   *
+   * @param {Capability} capability
+   * @param {Event} withEvent
+   * @param {object} params
+   */
+  _runEventFor(capability, withEvent, params = {}) {
+    if (
+      capability &&
+      withEvent &&
+      capability[withEvent] &&
+      capability[withEvent] instanceof Function
+    ) {
+      this._addToQueue(withEvent, () => capability[withEvent](this, params))
+      if (this.options.debug) {
+        console.info(`[CookieConsent]: Added ${capability.name}.${withEvent} to queue`)
+      }
+    } else {
+      if (this.options.debug) {
+        console.warn(
+          `[CookieConsent]: Capability ${capability.name} has no event of name ${withEvent}`
+        )
       }
     }
   }
 
-  runEventsFor(loop, withEvent) {
-    loop.forEach(({ name }) => {
-      const handler = this.options.labels.find(({ name: lName }) => lName === name)
-      this.runEventFor(handler, withEvent)
-    })
-  }
+  /**
+   * Run common or value change/update events for one capability.
+   *
+   * @param {Capability} capability
+   * @param {Choice} withChoice
+   */
+  _runValueEventsFor(capability, withChoice) {
+    let params = {
+      choice: withChoice.value,
+    }
 
-  runEventCircle(choices) {
-    choices.forEach(({ name, value }) => {
-      const handler = this.options.labels.find(({ name: lName }) => lName === name)
-      if (value) {
-        this.runEventFor(handler, Event.ON_ACCEPT)
-      } else {
-        this.runEventFor(handler, Event.ON_REJECT)
+    // on input value update
+    this._runEventFor(capability, Event.ON_UPDATE, params)
+
+    // on input value change
+    const userOptions = this.loadUserOptions()
+    // load saved cookie options choices if present
+    if (userOptions?.choices) {
+      // find current choice in saved choices
+      const choice = userOptions.choices.find((c) => c.name === withChoice.name)
+      // check against input choice value
+      const hasChanged = withChoice.value !== choice.value
+      if (hasChanged) {
+        this._runEventFor(capability, Event.ON_VALUE_CHANGED, params)
       }
-    })
+    }
   }
 }

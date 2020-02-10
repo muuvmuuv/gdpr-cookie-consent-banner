@@ -37,7 +37,7 @@
 
 .cookiebanner {
   width: 100%;
-  max-width: 400px;
+  max-width: 450px;
   height: auto;
   padding: 20px;
 
@@ -45,6 +45,7 @@
     margin-bottom: 15px;
 
     .title {
+      margin-bottom: 5px;
       font-size: 1.2em;
     }
 
@@ -59,8 +60,9 @@
 
   .choice {
     display: grid;
+    grid-auto-flow: row;
+    grid-auto-rows: auto;
     grid-template-columns: auto 1fr;
-    grid-template-rows: 1fr 1fr;
     align-items: center;
     justify-content: center;
     margin-bottom: 5px;
@@ -68,19 +70,18 @@
     column-gap: 15px;
     border-radius: 2px;
     background: var(--cookieconsent-background-richer);
+    row-gap: 5px;
 
     input {
-      grid-row-end: 3;
       grid-row-start: 1;
     }
 
     .name {
       display: block;
       grid-column-start: 2;
-      grid-row-end: 3;
       grid-row-start: 1;
       width: 100%;
-      margin-bottom: 0;
+      margin-top: 3px;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
@@ -88,7 +89,9 @@
     }
 
     .info {
+      grid-area: info;
       grid-column-start: 2;
+      grid-row-start: 2;
       margin-top: -2px;
       margin-bottom: 0;
       color: var(--cookieconsent-color-richer);
@@ -127,6 +130,18 @@
 
     .accept {
       background: var(--cookieconsent-green);
+    }
+  }
+
+  a {
+    color: var(--cookieconsent-color-richer);
+
+    @include noReducedMotion() {
+      transition: color 140ms ease-in-out;
+    }
+
+    &:hover {
+      color: var(--cookieconsent-color);
     }
   }
 }

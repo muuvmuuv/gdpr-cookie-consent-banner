@@ -4,6 +4,7 @@
   grid-template-areas: 'numbers code';
   grid-template-columns: auto 1fr;
   margin-bottom: var(--content-margin);
+  background: var(--color-light);
   font-family: var(--font-mono);
   font-size: var(--text-xs);
   line-height: 1.6;
@@ -12,7 +13,6 @@
 
   code {
     grid-area: code;
-    margin: 0 2px;
     padding: var(--spacing-sm);
     overflow-x: scroll;
     border: 1px solid var(--color-primary-light);
@@ -45,9 +45,12 @@
       padding: var(--spacing-xxs) var(--spacing-xs);
       border: 1px solid var(--color-primary-light);
       border-right: 0;
+      background: var(--color-light);
     }
 
     button {
+      line-height: inherit;
+
       &:hover {
         opacity: 0.6;
       }

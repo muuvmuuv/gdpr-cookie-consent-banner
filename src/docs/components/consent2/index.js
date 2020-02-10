@@ -56,22 +56,21 @@ const Consent2 = () => {
       name: 'consent-with-ga',
       banner: document.getElementById('cookiebanner2'),
       notice: document.getElementById('cookienotice2'),
-      labels: [
+      capabilities: [
         {
           name: 'functional',
           checked: true,
-          onReject: (consent) => {
-            consent.saveCookieOptions({ consented: true })
-          },
           onAccept: (consent) => {
+            console.log('[functional2:onAccept]')
             const choices = consent.getChoices()
-            consent.saveCookieOptions({ choices, consented: true })
+            consent.saveUserOptions({ choices, consented: true })
           },
         },
         {
           name: 'analytics',
           checked: false,
           onReject: () => {
+            console.log('[analytics:onReject]')
             if (CookieConsent.cookieService.findCookie('_g')) {
               CookieConsent.cookieService.clearCookies('_g', {
                 expires: new Date('1996-06-13'),
@@ -79,6 +78,7 @@ const Consent2 = () => {
             }
           },
           onAccept: () => {
+            console.log('[analytics:onAccept]')
             const head = document.getElementsByTagName('head')[0]
             const script = document.createElement('script')
             script.src = 'https://www.googletagmanager.com/gtag/js?id=UA-156811148-1'
