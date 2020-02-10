@@ -1,9 +1,11 @@
-# CookieConsent 🍪
+# GDPR Cookie Consent Banner 🍪
 
-[Demo](https://muuvmuuv.github.io/cookie-consent/)
+[Demo page with examples](https://muuvmuuv.github.io/gdpr-cookie-consent-banner/)
 
 A full featured, small (8K) and easy to use library to show a cookie consent banner on
-your website. It is fully tested and GDPR ready.
+your website. It is fully tested and GDPR/DSGVO ready.
+
+<img src="assets/banner.png" align="right" />
 
 - [Installation](#installation)
 - [The Why](#the-why)
@@ -38,8 +40,6 @@ npm install gdpr-cookie-consent-banner
 
 ## The Why
 
-Why another gdpr cookie consent banner plugin? Does it even makes sense?
-
 The company I've been working at had several discussion with their data protection
 officer. In Germany and the EU we must do so called "opt-in" for all cookies. After
 several weeks we came up with the following requirements: fully opt-in without any
@@ -53,8 +53,8 @@ CSS or had no hooks to customize events. So that is why I created this.
 
 By default this plugin will create a banner with a functional capability, those are for
 initial hide the banner and save user choices. If you add capabilities by yourself you
-need to [add this capability again](src/lib/consent.js#L17-L32), because we will not merge
-them with your config.
+need to [add this capability again](src/lib/consent.js#L17-L32), because they will not be
+merged with your config.
 
 For the most, the example configuration with
 [Google Analytics](src/docs/components/consent2/index.js) may be enough but if you need to
@@ -159,7 +159,7 @@ window.consent = new CookieConsent({
 
 ## Advanced
 
-Have a look at our [demo](https://muuvmuuv.github.io/cookie-consent/) page to see advanced
+Have a look at the [demo](https://muuvmuuv.github.io/cookie-consent/) to see advanced
 functionalities in action or the source of it, which you can find in
 [`src/docs`](src/docs/). The docs are written in preact so the actual consent component
 lives in `components` and includes a full Google Analytics example.
