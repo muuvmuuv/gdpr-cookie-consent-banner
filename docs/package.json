@@ -1,6 +1,7 @@
 {
   "private": true,
   "scripts": {
+    "build": "preact build --src . --dest ../tmp",
     "watch": "preact watch --src ."
   },
   "devDependencies": {
@@ -21,6 +22,7 @@
     "preact-router": "^3.2.1",
     "prettier": "^1.19.1",
     "prism-react-renderer": "^1.0.2",
-    "react-helmet-async": "^1.0.4"
+    "react-helmet-async": "^1.0.4",
+    "sass-loader": "^8.0.2"
   }
 }
