@@ -288,8 +288,10 @@ window.onload = function() {
           // find all cookies starting with a `_g`
           if (CookieConsent.cookieService.findCookie('_g')) {
             // yes? remove all cookies starting with a `_g`
+            var regex = /[-\w]+\.(?:[-\w]+\.xn--[-\w]+|[-\w]{3,}|[-\w]+\.[-\w]{2})$/i
+            var tld = window.location.hostname.match(regex)[0]
             CookieConsent.cookieService.clearCookies('_g', {
-              expires: new Date('1996-06-13'), // required!
+              domain: '.' + tld,
             })
           }
         },

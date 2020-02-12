@@ -95,8 +95,10 @@ const Consent2 = () => {
           onReject: () => {
             console.log('[ga_analytics:onReject]')
             if (CookieConsent.cookieService.findCookie('_g')) {
+              const regex = /[-\w]+\.(?:[-\w]+\.xn--[-\w]+|[-\w]{3,}|[-\w]+\.[-\w]{2})$/i
+              const tld = window.location.hostname.match(regex)[0]
               CookieConsent.cookieService.clearCookies('_g', {
-                expires: new Date('1996-06-13'),
+                domain: '.' + tld,
               })
             }
           },
