@@ -2,6 +2,7 @@ import { prefersReducedMotion } from './accessibility'
 import { getCookie, setCookie, removeCookie } from './cookie'
 
 const Event = {
+  // order is important here
   ON_UPDATE: 'onUpdate',
   ON_VALUE_CHANGED: 'onValueChange',
   ON_ACCEPT: 'onAccept',
@@ -15,17 +16,23 @@ export default class CookieConsent {
       name: 'cookie-consent',
       banner: document.getElementById('cookiebanner'),
       notice: document.getElementById('cookienotice'),
+      linkOnly: false,
+      onRejectEnd: () => {
+        window.location.reload()
+      },
+      onAcceptEnd: (consent) => {
+        const choices = consent.getChoices()
+        consent.saveUserOptions({ choices })
+      },
       capabilities: [
         {
           name: 'functional',
           checked: true,
           onReject: (consent) => {
             consent.removeUserOptions()
-            window.location.reload()
           },
           onAccept: (consent) => {
-            const choices = consent.getChoices()
-            consent.saveUserOptions({ choices, consented: true })
+            consent.saveUserOptions({ consented: true })
           },
         },
       ],
@@ -33,8 +40,6 @@ export default class CookieConsent {
 
     this.options = { ...defaultOptions, ...options }
     this.queue = [] // this will hold event hooks to run in order
-
-    // console.log(this.options)
 
     if (!this.options.banner || !this.options.notice) {
       console.error('Can not find required elements!')
@@ -64,9 +69,9 @@ export default class CookieConsent {
     }
 
     if (content && content.consented) {
-      this.showElement(this.options.notice)
+      this.showNotice()
     } else {
-      this.showElement(this.options.banner)
+      this.showBanner()
     }
   }
 
@@ -98,10 +103,15 @@ export default class CookieConsent {
         this._runEventFor(capability, Event.ON_REJECT)
       })
       this._startRunner()
+      this.setChoices(choices)
+      this.saveUserOptions({ choices })
+      if (this.options.onRejectEnd instanceof Function) {
+        this.options.onRejectEnd(this)
+      }
       if (this.options.debug) console.timeEnd('reject')
-      this.hideElement(this.options.banner)
+      this.hideBanner()
       setTimeout(() => {
-        this.showElement(this.options.notice)
+        this.showNotice()
       }, 160)
     })
 
@@ -115,17 +125,20 @@ export default class CookieConsent {
         this._runEventFor(capability, Event.ON_ACCEPT)
       })
       this._startRunner()
+      if (this.options.onAcceptEnd instanceof Function) {
+        this.options.onAcceptEnd(this)
+      }
       if (this.options.debug) console.timeEnd('accept')
-      this.hideElement(this.options.banner)
+      this.hideBanner()
       setTimeout(() => {
-        this.showElement(this.options.notice)
+        this.showNotice()
       }, 160)
     })
 
     // Show banner
     this.options.notice.addEventListener('click', () => {
-      this.hideElement(this.options.notice)
-      this.showElement(this.options.banner)
+      this.hideNotice()
+      this.showBanner()
     })
   }
 
@@ -239,7 +252,6 @@ export default class CookieConsent {
         })
         .addEventListener('finish', function onFinish() {
           element.classList.add('visible')
-          element.removeEventListener('finish', onFinish)
         })
     } else {
       element.classList.add('visible')
@@ -260,10 +272,33 @@ export default class CookieConsent {
         })
         .addEventListener('finish', function onFinish() {
           element.classList.remove('visible')
-          element.removeEventListener('finish', onFinish)
         })
     } else {
       element.classList.remove('visible')
+    }
+  }
+
+  /**
+   * Hide/Show the banner.
+   */
+  hideBanner() {
+    this.hideElement(this.options.banner)
+  }
+  showBanner() {
+    this.showElement(this.options.banner)
+  }
+
+  /**
+   * Hide/Show the notice.
+   */
+  hideNotice() {
+    if (!this.options.linkOnly) {
+      this.hideElement(this.options.notice)
+    }
+  }
+  showNotice() {
+    if (!this.options.linkOnly) {
+      this.showElement(this.options.notice)
     }
   }
 

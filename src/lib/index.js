@@ -1,5 +1,5 @@
 import CookieConsent from './consent'
-import CookieService from './cookie'
+import * as CookieService from './cookie'
 
 import '../style.scss'
 

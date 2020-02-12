@@ -3,7 +3,13 @@ const cookieDefaults = {
   path: '/',
 }
 
-function getCookie(withName) {
+function createCookieString(withOptions) {
+  return Object.keys(withOptions)
+    .map((key) => `${key}=${withOptions[key]}`)
+    .join('; ')
+}
+
+export function getCookie(withName) {
   const value = ('; ' + document.cookie)
     .split(`; ${withName}=`)
     .pop()
@@ -17,7 +23,7 @@ function getCookie(withName) {
   return JSON.parse(value)
 }
 
-function getAllCookies() {
+export function getAllCookies() {
   const strings = document.cookie.split('; ')
   const cookies = strings.map((str) => {
     const [key, value] = str.split('=')
@@ -26,7 +32,7 @@ function getAllCookies() {
   return cookies
 }
 
-function setCookie(withName, andValue, andOptions) {
+export function setCookie(withName, andValue, andOptions) {
   let options = {}
   options[withName] = JSON.stringify(andValue)
   options = { ...options, ...cookieDefaults, ...andOptions }
@@ -34,7 +40,7 @@ function setCookie(withName, andValue, andOptions) {
   document.cookie = options
 }
 
-function removeCookie(withName, andOptions) {
+export function removeCookie(withName, andOptions) {
   let options = {}
   options[withName] = ''
   options['max-age'] = 0
@@ -45,7 +51,7 @@ function removeCookie(withName, andOptions) {
   setCookie(withName, options)
 }
 
-function clearCookies(thatMatch, withOptions) {
+export function clearCookies(thatMatch, withOptions) {
   const allCookies = getAllCookies()
   const regex = new RegExp(`^${thatMatch}`, 'g')
   allCookies.forEach(({ key }) => {
@@ -55,33 +61,15 @@ function clearCookies(thatMatch, withOptions) {
   })
 }
 
-function findCookie(thatMatch) {
+export function findCookie(thatMatch) {
   const allCookies = getAllCookies()
   const regex = new RegExp(`^${thatMatch}`, 'g')
   const cookie = allCookies.find(({ key }) => regex.test(key))
   return cookie || null
 }
 
-function getExpirationDate(expiringDays = 365) {
+export function getExpirationDate(expiringDays = 365) {
   const expireDate = new Date()
   expireDate.setTime(expireDate.getTime() + expiringDays * 24 * 60 * 60 * 1000)
   return expireDate
 }
-
-function createCookieString(withOptions) {
-  return Object.keys(withOptions)
-    .map((key) => `${key}=${withOptions[key]}`)
-    .join('; ')
-}
-
-export { getCookie, getAllCookies, setCookie, removeCookie, findCookie, clearCookies }
-const CookieService = {
-  getCookie,
-  getAllCookies,
-  setCookie,
-  removeCookie,
-  findCookie,
-  clearCookies,
-  getExpirationDate,
-}
-export default CookieService

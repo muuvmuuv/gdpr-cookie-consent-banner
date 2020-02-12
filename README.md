@@ -16,6 +16,7 @@ your website. It is fully tested and GDPR/DSGVO ready.
 - [Options](#options)
   - [Capability](#capability)
 - [Advanced](#advanced)
+  - [Cookie service](#cookie-service)
 - [Events](#events)
   - [onReject](#onreject)
     - [Example](#example)
@@ -25,7 +26,9 @@ your website. It is fully tested and GDPR/DSGVO ready.
     - [Example](#example-2)
   - [onValueChange](#onvaluechange)
     - [Example](#example-3)
-- [Google Analytics](#google-analytics)
+- [Future ideas](#future-ideas)
+- [Examples](#examples)
+  - [Google Analytics](#google-analytics)
 
 In use by this companies/people:
 
@@ -133,18 +136,26 @@ import CookieConsent from 'gdpr-cookie-consent-banner'
 const CookieConsent = require('gdpr-cookie-consent-banner')
 
 window.consent = new CookieConsent({
-  /* options */
+  /* name: "my-consent-name" */
 })
 ```
 
 ## Options
 
-| Option         | Default                   | Type         | Description                     |
-| -------------- | ------------------------- | ------------ | ------------------------------- |
-| `name`         | `cookie-consent`          | string       | The name of your cookie.        |
-| `banner`       | `…byId('cookieconsent')`  | HTMLElement  | The banner html element.        |
-| `notice`       | `…byId('cookienotice')`   | HTMLElement  | The notice html element.        |
-| `capabilities` | see [Advanced](#advanced) | Capability[] | Capabilities you want to apply. |
+| Option         | Default                                                   | Type         | Description                                              |
+| -------------- | --------------------------------------------------------- | ------------ | -------------------------------------------------------- |
+| `name`         | `cookie-consent`                                          | string       | The name of your cookie.                                 |
+| `banner`       | [src/lib/consent.js](src/lib/consent.js)@`defaultOptions` | HTMLElement  | The banner html element.                                 |
+| `notice`       | [src/lib/consent.js](src/lib/consent.js)@`defaultOptions` | HTMLElement  | The notice html element.                                 |
+| `linkOnly`     | `false`                                                   | boolean      | If the notice is a link or should be a floating element. |
+| `onRejectEnd`  | [src/lib/consent.js](src/lib/consent.js)@`defaultOptions` | Function     | Called when all `onReject` events ran.                   |
+| `onAcceptEnd`  | [src/lib/consent.js](src/lib/consent.js)@`defaultOptions` | Function     | Called when all `onAccept` events ran.                   |
+| `capabilities` | see [Advanced](#advanced)                                 | Capability[] | Capabilities you want to apply.                          |
+
+> NOTE: When you add `capabilities` you will override the `defaultOptions.capabilities`.
+> When you don't need them OK but if you need the functionality from the `functional`
+> capability copy it yourself into your code →
+> [src/lib/consent.js](src/lib/consent.js)@`defaultOptions`.
 
 ### Capability
 
@@ -166,6 +177,22 @@ lives in `components` and includes a full Google Analytics example.
 
 Every event hook has acccess to the `CookieConsent` instance and all its functions. Some
 others also provide params. Below is a list of what is available with examples.
+
+### Cookie service
+
+The `CookieService` provides some functions to handle cookies properly. It is exposed
+inside the `CookieConsent` class and can be accessed with `CookieConsent.cookieService`.
+See [Google Analytics](#google-analytics) example below.
+
+- `getCookie(withName)`: get a cookie by its name
+- `getAllCookies()`: get all cookies
+- `setCookie(withName, andValue, andOptions)`: set a cookie with options
+- `removeCookie(withName, andOptions)`: remove a cookie by its name and options
+- `clearCookies(thatMatch, withOptions)`: clear all cookies that match given string (regex
+  will match from beginning: `_g` => `_gat`)
+- `findCookie(thatMatch)`: find a cookie that match given string
+- `getExpirationDate(expiringDays = 365)`: create an expiration date for your cookie (not
+  needed by default)
 
 ## Events
 
@@ -231,20 +258,34 @@ const onValueChange = (consent, { value }) => {
 }
 ```
 
-## Google Analytics
+## Future ideas
+
+- [ ] Create plugin system, so Google Analytics does not need to be setup by someone
+      itself
+- [ ] Option to create the banner without defining the HTML somewhere
+
+## Examples
+
+### Google Analytics
 
 This is an example of a working Google Analytics configuration (as seen in the docs).
 
 ```js
 window.consent = new CookieConsent({
   name: 'consent-with-ga',
+  onRejectEnd: () => {
+    window.location.reload()
+  },
+  onAcceptEnd: (consent) => {
+    const choices = consent.getChoices()
+    consent.saveUserOptions({ choices })
+  },
   capabilities: [
     {
       name: 'functional',
       checked: true,
       onAccept: (consent) => {
-        const choices = consent.getChoices()
-        consent.savePluginOptions({ choices, consented: true })
+        consent.savePluginOptions({ consented: true })
       },
     },
     {
@@ -257,8 +298,6 @@ window.consent = new CookieConsent({
           CookieConsent.cookieService.clearCookies('_g', {
             expires: new Date('1996-06-13'), // required!
           })
-          // reload the window
-          window.location.reload()
         }
       },
       onAccept: () => {
@@ -273,7 +312,7 @@ window.consent = new CookieConsent({
           }
           gtag('js', new Date())
           gtag('config', 'UA-156811148-1', {
-            anonymize_ip: true,
+            anonymize_ip: true, // required in the EU
           })
         }
         head.appendChild(script)
