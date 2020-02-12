@@ -1,0 +1,17 @@
+footer {
+  margin-top: var(--spacing-xxl);
+  text-align: center;
+  user-select: none;
+
+  a {
+    margin: 0 var(--spacing-sm);
+    transition: opacity 160ms ease-in-out;
+    opacity: 0.3;
+    color: var(--color-dark);
+    text-decoration: none;
+
+    &:hover {
+      opacity: 1;
+    }
+  }
+}
