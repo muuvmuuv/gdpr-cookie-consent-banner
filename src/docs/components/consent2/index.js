@@ -26,10 +26,33 @@ const Banner = () => (
         />
         <div className="name">Functional with a very long long long long long</div>
       </label>
-      <label className="choice" htmlFor="choice-analytics">
-        <input type="checkbox" name="choice:analytics" id="choice-analytics" />
-        <div className="name">Analytics</div>
-        <p className="info">Google Tag Manager will be enabled here.</p>
+      <label className="choice" htmlFor="choice-ga_analytics">
+        <input type="checkbox" name="choice:ga_analytics" id="choice-ga_analytics" />
+        <div className="name">Google Analytics</div>
+        <p className="info">
+          Google Tag Manager will be enabled here. Read more about it here:{' '}
+          <a
+            href="https://www.google.com/intl/de/tagmanager/faq.html"
+            rel="noopener noreferrer"
+            target="_blank"
+          >
+            Google Tag Manager FAQ
+          </a>
+        </p>
+      </label>
+      <label className="choice" htmlFor="choice-sa_analytics">
+        <input type="checkbox" name="choice:sa_analytics" id="choice-sa_analytics" />
+        <div className="name">Simple Analytics</div>
+        <p className="info">
+          Privacy first analytics provider. Read more here:{' '}
+          <a
+            href="https://docs.simpleanalytics.com/what-we-collect?ref=simpleanalytics.com"
+            rel="noopener noreferrer"
+            target="_blank"
+          >
+            Simple Analytics – What we collect
+          </a>
+        </p>
       </label>
     </div>
     <div className="buttons">
@@ -62,15 +85,14 @@ const Consent2 = () => {
           checked: true,
           onAccept: (consent) => {
             console.log('[functional2:onAccept]')
-            const choices = consent.getChoices()
-            consent.saveUserOptions({ choices, consented: true })
+            consent.saveUserOptions({ consented: true })
           },
         },
         {
-          name: 'analytics',
+          name: 'ga_analytics',
           checked: false,
           onReject: () => {
-            console.log('[analytics:onReject]')
+            console.log('[ga_analytics:onReject]')
             if (CookieConsent.cookieService.findCookie('_g')) {
               CookieConsent.cookieService.clearCookies('_g', {
                 expires: new Date('1996-06-13'),
@@ -78,7 +100,7 @@ const Consent2 = () => {
             }
           },
           onAccept: () => {
-            console.log('[analytics:onAccept]')
+            console.log('[ga_analytics:onAccept]')
             const head = document.getElementsByTagName('head')[0]
             const script = document.createElement('script')
             script.src = 'https://www.googletagmanager.com/gtag/js?id=UA-156811148-1'
@@ -94,6 +116,17 @@ const Consent2 = () => {
               })
             }
             head.appendChild(script)
+          },
+        },
+        {
+          name: 'sa_analytics',
+          checked: false,
+          onReject: () => {
+            console.log('[sa_analytics:onReject]')
+          },
+          onAccept: () => {
+            console.log('[sa_analytics:onAccept]')
+            console.log('not yet configured')
           },
         },
       ],

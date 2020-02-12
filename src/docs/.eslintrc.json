@@ -1,6 +1,6 @@
 {
   "extends": [
-    "../../.eslintrc.json",
+    "../lib/.eslintrc.json",
     "plugin:react/recommended",
     "plugin:jsx-a11y/recommended"
   ],
