@@ -271,55 +271,49 @@ const onValueChange = (consent, { value }) => {
 This is an example of a working Google Analytics configuration (as seen in the docs).
 
 ```js
-window.consent = new CookieConsent({
-  name: 'consent-with-ga',
-  onRejectEnd: () => {
-    window.location.reload()
-  },
-  onAcceptEnd: (consent) => {
-    const choices = consent.getChoices()
-    consent.saveUserOptions({ choices })
-  },
-  capabilities: [
-    {
-      name: 'functional',
-      checked: true,
-      onAccept: (consent) => {
-        consent.savePluginOptions({ consented: true })
+window.onload = function() {
+  window.consent = new CookieConsent({
+    capabilities: [
+      {
+        name: 'functional',
+        checked: true,
+        onAccept: function(consent) {
+          consent.saveUserOptions({ consented: true })
+        },
       },
-    },
-    {
-      name: 'analytics',
-      checked: false,
-      onReject: () => {
-        // find all cookies starting with a `_g`
-        if (CookieConsent.cookieService.findCookie('_g')) {
-          // yes? remove all cookies starting with a `_g`
-          CookieConsent.cookieService.clearCookies('_g', {
-            expires: new Date('1996-06-13'), // required!
-          })
-        }
-      },
-      onAccept: () => {
-        const head = document.getElementsByTagName('head')[0]
-        const script = document.createElement('script')
-        script.src = 'https://www.googletagmanager.com/gtag/js?id=UA-156811148-1'
-        script.async = true
-        script.onload = () => {
-          window.dataLayer = window.dataLayer || []
-          function gtag() {
-            window.dataLayer.push(arguments)
+      {
+        name: 'analytics',
+        checked: false,
+        onReject: function() {
+          // find all cookies starting with a `_g`
+          if (CookieConsent.cookieService.findCookie('_g')) {
+            // yes? remove all cookies starting with a `_g`
+            CookieConsent.cookieService.clearCookies('_g', {
+              expires: new Date('1996-06-13'), // required!
+            })
           }
-          gtag('js', new Date())
-          gtag('config', 'UA-156811148-1', {
-            anonymize_ip: true, // required in the EU
-          })
-        }
-        head.appendChild(script)
+        },
+        onAccept: function() {
+          const head = document.getElementsByTagName('head')[0]
+          const script = document.createElement('script')
+          script.src = 'https://www.googletagmanager.com/gtag/js?id=UA-156811148-1'
+          script.async = true
+          script.onload = function() {
+            window.dataLayer = window.dataLayer || []
+            function gtag() {
+              window.dataLayer.push(arguments)
+            }
+            gtag('js', new Date())
+            gtag('config', 'UA-156811148-1', {
+              anonymize_ip: true, // required in the EU
+            })
+          }
+          head.appendChild(script)
+        },
       },
-    },
-  ],
-})
+    ],
+  })
+}
 ```
 
 ```html
