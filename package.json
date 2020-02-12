@@ -26,7 +26,7 @@
   "scripts": {
     "build": "microbundle --name CookieConsent",
     "watch": "microbundle --name CookieConsent watch",
-    "prepublishOnly": "pnpm run lib-build",
+    "prepublishOnly": "pnpm run build",
     "lint": "eslint lib",
     "docs-build": "preact build --src docs",
     "docs-watch": "preact watch --src docs"
