@@ -77,7 +77,7 @@ const Notice = () => (
 const Consent2 = () => {
   useEffect(() => {
     window.consent2 = new CookieConsent({
-      name: 'consent-with-ga',
+      name: 'with-ga',
       banner: document.getElementById('cookiebanner2'),
       notice: document.getElementById('cookienotice2'),
       capabilities: [
@@ -85,7 +85,7 @@ const Consent2 = () => {
           name: 'functional',
           checked: true,
           onAccept: (consent) => {
-            console.log('[functional2:onAccept]')
+            console.log('[with-ga:functional2] onAccept called')
             consent.saveUserOptions({ consented: true })
           },
         },
@@ -93,7 +93,7 @@ const Consent2 = () => {
           name: 'ga_analytics',
           checked: false,
           onReject: () => {
-            console.log('[ga_analytics:onReject]')
+            console.log('[with-ga:ga_analytics] onReject called')
             if (CookieConsent.cookieService.findCookie('_g')) {
               const regex = /[-\w]+\.(?:[-\w]+\.xn--[-\w]+|[-\w]{3,}|[-\w]+\.[-\w]{2})$/i
               const tld = window.location.hostname.match(regex)[0]
@@ -103,7 +103,7 @@ const Consent2 = () => {
             }
           },
           onAccept: () => {
-            console.log('[ga_analytics:onAccept]')
+            console.log('[with-ga:ga_analytics] onAccept called')
             const head = document.getElementsByTagName('head')[0]
             const script = document.createElement('script')
             script.src = 'https://www.googletagmanager.com/gtag/js?id=UA-156811148-1'
@@ -118,18 +118,29 @@ const Consent2 = () => {
                 anonymize_ip: true,
               })
             }
-            head.appendChild(script)
+            // head.appendChild(script)
+            console.log(
+              '[with-ga:sa_analytics]',
+              'GA would be loaded now but commented out'
+            )
           },
         },
         {
           name: 'sa_analytics',
           checked: false,
           onReject: () => {
-            console.log('[sa_analytics:onReject]')
+            console.log('[with-ga:sa_analytics] onReject called')
           },
           onAccept: () => {
-            console.log('[sa_analytics:onAccept]')
-            console.log('not yet configured')
+            console.log('[with-ga:sa_analytics] onAccept called')
+            const head = document.getElementsByTagName('head')[0]
+            const script = document.createElement('script')
+            script.src = 'https://cdn.simpleanalytics.io/hello.js'
+            script.async = true
+            script.onload = () => {
+              console.log('[with-ga:sa_analytics] script fully loaded')
+            }
+            head.appendChild(script)
           },
         },
       ],

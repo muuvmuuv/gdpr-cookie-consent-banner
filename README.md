@@ -16,16 +16,20 @@ your website. It is fully tested and GDPR/DSGVO ready.
 - [Options](#options)
   - [Capability](#capability)
 - [Advanced](#advanced)
-  - [Cookie service](#cookie-service)
+  - [Cookies](#cookies)
 - [Events](#events)
-  - [onReject](#onreject)
+  - [onRejectEnd](#onrejectend)
     - [Example](#example)
-  - [onAccept](#onaccept)
+  - [onAcceptEnd](#onacceptend)
     - [Example](#example-1)
-  - [onUpdate](#onupdate)
+  - [capability.onReject](#capabilityonreject)
     - [Example](#example-2)
-  - [onValueChange](#onvaluechange)
+  - [capability.onAccept](#capabilityonaccept)
     - [Example](#example-3)
+  - [capability.onUpdate](#capabilityonupdate)
+    - [Example](#example-4)
+  - [capability.onValueChange](#capabilityonvaluechange)
+    - [Example](#example-5)
 - [Future ideas](#future-ideas)
 - [Examples](#examples)
   - [Google Analytics](#google-analytics)
@@ -117,6 +121,9 @@ Examples (those you see in the demo) can be found here:
 JavaScript:
 
 ```js
+/* to modify cookies use this static class */
+const Coookie = CookieConsent.cookie
+
 window.consent = new CookieConsent({
   /* options */
 })
@@ -134,6 +141,9 @@ JavaScript:
 import CookieConsent from 'gdpr-cookie-consent-banner'
 // or
 const CookieConsent = require('gdpr-cookie-consent-banner')
+
+/* to modify cookies use this static class */
+const Coookie = CookieConsent.cookie
 
 window.consent = new CookieConsent({
   /* name: "my-consent-name" */
@@ -178,42 +188,77 @@ lives in `components` and includes a full Google Analytics example.
 Every event hook has acccess to the `CookieConsent` instance and all its functions. Some
 others also provide params. Below is a list of what is available with examples.
 
-### Cookie service
+### Cookies
 
-The `CookieService` provides some functions to handle cookies properly. It is exposed
-inside the `CookieConsent` class and can be accessed with `CookieConsent.cookieService`.
-See [Google Analytics](#google-analytics) example below.
+Inside `CookieConsent` lives a static class with some utilities to work with cookies. Here
+is a list of all functions, also have a look at the [Google Analytics](#google-analytics)
+example below.
 
-- `getCookie(withName)`: get a cookie by its name
-- `getAllCookies()`: get all cookies
-- `setCookie(withName, andValue, andOptions)`: set a cookie with options
-- `removeCookie(withName, andOptions)`: remove a cookie by its name and options
-- `clearCookies(thatMatch, withOptions)`: clear all cookies that match given string (regex
-  will match from beginning: `_g` => `_gat`)
-- `findCookie(thatMatch)`: find a cookie that match given string
-- `getExpirationDate(expiringDays = 365)`: create an expiration date for your cookie (not
-  needed by default)
+- `set(...)`: set/create a new cookie
+  - `name`
+  - `value`
+  - `domain`
+  - `path`
+  - `maxAge` (default: `7`)
+  - `secure`
+  - `sameSite` (default: `Lax`)
+- `get(...)`: get a cookie by its name
+  - `name`
+- `getAll()`: get all cookies
+- `find(...)`: find a cookie that match given string/regex
+  - `regex`: string or regex, e.g. `g_` or `/^g_/g`
+- `delete(...)`: delete a cookie by its name and options
+  - `name`
+  - `domain`
+  - `path`
+- `deleteAll()`: deletes all cookies
+  - `domain`
+  - `path`
+- `clear(thatMatch, withOptions)`: clear all cookies that match given string/regex
+  - `regex`: string or regex, e.g. `g_` or `/^g_/g`
+  - `domain`
+  - `path`
 
 ## Events
 
-### onReject
+### onRejectEnd
 
 - `consent` (CookieConsent): [`src/lib/consent.js`](src/lib/consent.js)
 
 #### Example
 
-> This is required!
-
 ```js
-const onReject = (consent) => {
-  // this will remove the plugin options cookie, so on next reload the user must consent again
-  consent.removePluginOptions()
+const onRejectEnd = (consent) => {
+  window.location.reload()
 }
 ```
 
-### onAccept
+### onAcceptEnd
 
-> This is required!
+- `consent` (CookieConsent): [`src/lib/consent.js`](src/lib/consent.js)
+
+#### Example
+
+```js
+const onAcceptEnd = (consent) => {
+  const choices = consent.getChoices()
+  consent.saveUserOptions({ choices })
+}
+```
+
+### capability.onReject
+
+- `consent` (CookieConsent): [`src/lib/consent.js`](src/lib/consent.js)
+
+#### Example
+
+```js
+const onReject = (consent) => {
+  consent.removeUserOptions()
+}
+```
+
+### capability.onAccept
 
 - `consent` (CookieConsent): [`src/lib/consent.js`](src/lib/consent.js)
 
@@ -221,14 +266,11 @@ const onReject = (consent) => {
 
 ```js
 const onAccept = (consent) => {
-  // you must do this, otherwise no options would be saved
-  const choices = consent.getChoices()
-  // `consented: true` says that the user rejected or accepted the choosen options
-  consent.savePluginOptions({ choices, consented: true })
+  consent.saveUserOptions({ consented: true })
 }
 ```
 
-### onUpdate
+### capability.onUpdate
 
 > Triggers when the choice is updated
 
@@ -239,11 +281,11 @@ const onAccept = (consent) => {
 
 ```js
 const onUpdate = (consent, { choice }) => {
-  console.log('Functional now:', choice)
+  console.log('Value is:', choice)
 }
 ```
 
-### onValueChange
+### capability.onValueChange
 
 > Triggers when the value has changed
 
@@ -253,8 +295,8 @@ const onUpdate = (consent, { choice }) => {
 #### Example
 
 ```js
-const onValueChange = (consent, { value }) => {
-  console.log('Value is:', value)
+const onValueChange = (consent, { choice }) => {
+  console.log('Value is:', choice)
 }
 ```
 
@@ -263,6 +305,7 @@ const onValueChange = (consent, { value }) => {
 - [ ] Create plugin system, so Google Analytics does not need to be setup by someone
       itself
 - [ ] Option to create the banner without defining the HTML somewhere
+- [x] Allow notice to be just a link
 
 ## Examples
 
@@ -277,40 +320,40 @@ window.onload = function() {
       {
         name: 'functional',
         checked: true,
-        onAccept: function(consent) {
+        onAccept: (consent) => {
           consent.saveUserOptions({ consented: true })
         },
       },
       {
         name: 'analytics',
         checked: false,
-        onReject: function() {
-          // find all cookies starting with a `_g`
-          if (CookieConsent.cookieService.findCookie('_g')) {
-            // yes? remove all cookies starting with a `_g`
-            var regex = /[-\w]+\.(?:[-\w]+\.xn--[-\w]+|[-\w]{3,}|[-\w]+\.[-\w]{2})$/i
-            var tld = window.location.hostname.match(regex)[0]
-            CookieConsent.cookieService.clearCookies('_g', {
-              domain: '.' + tld,
-            })
+        onReject: () => {
+          if (CookieConsent.cookie.find('_g')) {
+            CookieConsent.cookie.clear('_g', '.' + window.location.hostname, '/')
           }
         },
-        onAccept: function() {
-          const head = document.getElementsByTagName('head')[0]
-          const script = document.createElement('script')
-          script.src = 'https://www.googletagmanager.com/gtag/js?id=UA-156811148-1'
-          script.async = true
-          script.onload = function() {
-            window.dataLayer = window.dataLayer || []
-            function gtag() {
-              window.dataLayer.push(arguments)
-            }
-            gtag('js', new Date())
-            gtag('config', 'UA-156811148-1', {
-              anonymize_ip: true, // required in the EU
-            })
+        onAccept: () => {
+          if (CookieConsent.cookie.find('ga-disable')) {
+            return
           }
-          head.appendChild(script)
+          const gaAddress = 'https://www.google-analytics.com/analytics.js'
+          ;(function(i, s, o, g, r, a, m) {
+            i['GoogleAnalyticsObject'] = r
+            ;(i[r] =
+              i[r] ||
+              function() {
+                ;(i[r].q = i[r].q || []).push(arguments)
+              }),
+              (i[r].l = 1 * new Date())
+            ;(a = s.createElement(o)), (m = s.getElementsByTagName(o)[0])
+            a.async = 1
+            a.src = g
+            m.parentNode.insertBefore(a, m)
+          })(window, document, 'script', gaAddress, 'ga')
+          ga('create', 'UA-XXXXXX-XX', window.location.hostname)
+          ga('set', 'forceSSL', true)
+          ga('set', 'anonymizeIp', true)
+          ga('send', 'pageview')
         },
       },
     ],
@@ -357,6 +400,6 @@ window.onload = function() {
   aria-label="Show the cookie settings again"
   role="button"
 >
-  <img src="/assets/cookie.svg" alt="A shield which represents privacy" />
+  <img src="/assets/cookie.svg" alt="Cookie icon" />
 </div>
 ```
