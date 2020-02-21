@@ -1,57 +1,65 @@
 export default `
-<html lang="en">
-  <head>
-    <link rel="stylesheet" href="./path/to/cookie-consent.umd.css" />
-    <script defer src="./path/to/cookie-consent.umd.js"></script>
-  </head>
-  <body>
-    <div
-      id="cookiebanner"
-      className="cookiebanner"
-      aria-label="Edit your cookie settings"
-      role="banner"
-    >
-      <div className="info">
-        <div className="title">Your Cookie Controls</div>
-        <div className="description">
-          Paste some info for your users here. For example a
-          <a href="#0">link to your privacy policy</a> or something similiar.
-        </div>
-      </div>
-      <div className="choices">
-        <label className="choice" htmlFor="choice-functional2">
-          <input
-            type="checkbox"
-            name="choice:functional"
-            id="choice-functional2"
-            checked
-          />
-          <div className="name">Functional</div>
-          <p className="info">
-            Rejecting will let this banner re-appear on every reload.
-          </p>
-        </label>
-        <label className="choice" htmlFor="choice-testest">
-          <input type="checkbox" name="choice:testest" id="choice-testest" />
-          <div className="name">Test</div>
-          <p className="info">
-            Lorem ipsum dolor sit amet consectetur adipisicing elit.
-          </p>
-        </label>
-      </div>
-      <div className="buttons">
-        <button className="reject">Reject choices</button>
-        <button className="accept">Accept choices</button>
-      </div>
-    </div>
-    <div
-      id="cookienotice"
-      className="cookienotice"
-      aria-label="Show the cookie settings again"
-      role="button"
-    >
-      <img src="/assets/cookie.svg" alt="A shield which represents privacy" />
-    </div>
-  </body>
-</html>
+<div
+  id="cookiebanner"
+  class="cookiebanner"
+  aria-label="Edit your cookie settings"
+  role="banner"
+>
+  <div class="info">
+    <div class="title">Your Cookie Controls</div>
+    <div class="description">Paste some info for your users here.</div>
+  </div>
+  <div class="choices">
+    <label class="choice" for="choice-functional">
+      <input
+        type="checkbox"
+        name="choice:functional"
+        id="choice-functional"
+        checked
+        disabled
+      />
+      <div class="name">Functional with a very long long long long long</div>
+    </label>
+    <label class="choice" for="choice-ga_analytics">
+      <input type="checkbox" name="choice:ga_analytics" id="choice-ga_analytics" />
+      <div class="name">Google Analytics</div>
+      <p class="info">
+        Google Tag Manager will be enabled here. Read more about it here:{' '}
+        <a
+          href="https://www.google.com/intl/de/tagmanager/faq.html"
+          rel="noopener noreferrer"
+          target="_blank"
+        >
+          Google Tag Manager FAQ
+        </a>
+      </p>
+    </label>
+    <label class="choice" for="choice-sa_analytics">
+      <input type="checkbox" name="choice:sa_analytics" id="choice-sa_analytics" />
+      <div class="name">Simple Analytics</div>
+      <p class="info">
+        Privacy first analytics provider. Read more here:{' '}
+        <a
+          href="https://docs.simpleanalytics.com/what-we-collect?ref=simpleanalytics.com"
+          rel="noopener noreferrer"
+          target="_blank"
+        >
+          Simple Analytics – What we collect
+        </a>
+      </p>
+    </label>
+  </div>
+  <div class="buttons">
+    <button class="reject">Reject choices</button>
+    <button class="accept">Accept choices</button>
+  </div>
+</div>
+<div
+  id="cookienotice"
+  class="cookienotice"
+  aria-label="Show the cookie settings again"
+  role="button"
+>
+  <img src="/assets/cookie.svg" alt="A shield which represents privacy" />
+</div>
 `

@@ -18,18 +18,20 @@ your website. It is fully tested and GDPR/DSGVO ready.
 - [Advanced](#advanced)
   - [Cookies](#cookies)
 - [Events](#events)
-  - [onRejectEnd](#onrejectend)
+  - [onConsent](#onconsent)
     - [Example](#example)
-  - [onAcceptEnd](#onacceptend)
+  - [onRejectEnd](#onrejectend)
     - [Example](#example-1)
-  - [capability.onReject](#capabilityonreject)
+  - [onAcceptEnd](#onacceptend)
     - [Example](#example-2)
-  - [capability.onAccept](#capabilityonaccept)
+  - [capability.onReject](#capabilityonreject)
     - [Example](#example-3)
-  - [capability.onUpdate](#capabilityonupdate)
+  - [capability.onAccept](#capabilityonaccept)
     - [Example](#example-4)
-  - [capability.onValueChange](#capabilityonvaluechange)
+  - [capability.onUpdate](#capabilityonupdate)
     - [Example](#example-5)
+  - [capability.onValueChange](#capabilityonvaluechange)
+    - [Example](#example-6)
 - [Future ideas](#future-ideas)
 - [Examples](#examples)
   - [Google Analytics](#google-analytics)
@@ -220,6 +222,21 @@ example below.
   - `path`
 
 ## Events
+
+### onConsent
+
+Is called when the user gives consent or not.
+
+- `consent` (CookieConsent): [`src/lib/consent.js`](src/lib/consent.js)
+
+#### Example
+
+```js
+const onConsent = (consent) => {
+  const choices = consent.getChoices()
+  consent.saveUserOptions({ choices, consented: true })
+}
+```
 
 ### onRejectEnd
 

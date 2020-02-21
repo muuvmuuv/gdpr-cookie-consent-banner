@@ -84,22 +84,14 @@ const Consent2 = () => {
         {
           name: 'functional',
           checked: true,
-          onAccept: (consent) => {
-            console.log('[with-ga:functional2] onAccept called')
-            consent.saveUserOptions({ consented: true })
-          },
         },
         {
           name: 'ga_analytics',
           checked: false,
           onReject: () => {
             console.log('[with-ga:ga_analytics] onReject called')
-            if (CookieConsent.cookieService.findCookie('_g')) {
-              const regex = /[-\w]+\.(?:[-\w]+\.xn--[-\w]+|[-\w]{3,}|[-\w]+\.[-\w]{2})$/i
-              const tld = window.location.hostname.match(regex)[0]
-              CookieConsent.cookieService.clearCookies('_g', {
-                domain: '.' + tld,
-              })
+            if (CookieConsent.cookie.find('_g')) {
+              CookieConsent.cookie.clear('_g', '.' + window.location.hostname, '/')
             }
           },
           onAccept: () => {

@@ -62,7 +62,6 @@ const Consent = () => {
   useEffect(() => {
     window.consent = new CookieConsent({
       name: 'default',
-      linkOnly: false,
       onRejectEnd: () => {
         console.log('[default] onRejectEnd called')
         window.location.reload()
@@ -70,9 +69,11 @@ const Consent = () => {
       onAcceptEnd: () => {
         console.log('[default] onAcceptEnd called')
       },
+      onConsent: () => {
+        console.log('[default] onConsent called')
+      },
       capabilities: [
         {
-          debug: true,
           name: 'functional',
           checked: true,
           onReject: (consent) => {
