@@ -9,17 +9,9 @@ import JavaScriptExample from './examples/javascript'
 const Home = () => {
   return (
     <div className={style.page}>
-      <h3>Install via pnpm</h3>
+      <h3>Install</h3>
       <Code language="shell">{`
 pnpm install gdpr-cookie-consent-banner
-`}</Code>
-      <h3>Install via yarn</h3>
-      <Code language="shell">{`
-yarn install gdpr-cookie-consent-banner
-`}</Code>
-      <h3>Install via npm</h3>
-      <Code language="shell">{`
-npm install gdpr-cookie-consent-banner
 `}</Code>
 
       <h3>HTML</h3>

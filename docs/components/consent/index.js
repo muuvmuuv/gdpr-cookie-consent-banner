@@ -14,7 +14,7 @@ const Banner = () => (
       <div className="title">Your Cookie Controls</div>
       <div className="description">
         Paste some info for your users here. For example a{' '}
-        <a href="#0">link to your privacy policy</a> or something similiar.
+        <a href="#0">link to your privacy policy</a> or something similar.
       </div>
     </div>
     <div className="choices">
@@ -75,7 +75,6 @@ const Consent = () => {
       capabilities: [
         {
           name: 'functional',
-          checked: true,
           onReject: (consent) => {
             console.log('[default:functional] onReject called')
             consent.removeUserOptions()
@@ -109,7 +108,7 @@ const Consent = () => {
         },
       ],
     })
-  }, [false])
+  }, [])
 
   return [<Banner key="banner" />, <Notice key="notice" />]
 }

@@ -30,7 +30,8 @@ const renderTokens = (tokens, getLineProps, getTokenProps) => {
 
 const Code = ({ children, language }) => {
   const [copyState, setCopyState] = useState('Copy')
-  const copyCode = () => {
+
+  function copyCode() {
     copy(children)
     setCopyState('Copied!')
     setTimeout(() => {

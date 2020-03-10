@@ -83,27 +83,26 @@ const Consent2 = () => {
       capabilities: [
         {
           name: 'functional',
-          checked: true,
+          noOptOut: true,
         },
         {
           name: 'ga_analytics',
-          checked: false,
           onReject: () => {
             console.log('[with-ga:ga_analytics] onReject called')
             if (CookieConsent.cookie.find('_g')) {
-              CookieConsent.cookie.clear('_g', '.' + window.location.hostname, '/')
+              CookieConsent.cookie.clear('_g', window.location.host, '/')
             }
           },
           onAccept: () => {
             console.log('[with-ga:ga_analytics] onAccept called')
-            const head = document.getElementsByTagName('head')[0]
+            // const head = document.getElementsByTagName('head')[0]
             const script = document.createElement('script')
             script.src = 'https://www.googletagmanager.com/gtag/js?id=UA-156811148-1'
             script.async = true
             script.onload = () => {
               window.dataLayer = window.dataLayer || []
-              function gtag() {
-                window.dataLayer.push(arguments)
+              function gtag(...props) {
+                window.dataLayer.push(props)
               }
               gtag('js', new Date())
               gtag('config', 'UA-156811148-1', {
@@ -113,7 +112,7 @@ const Consent2 = () => {
             // head.appendChild(script)
             console.log(
               '[with-ga:sa_analytics]',
-              'GA would be loaded now but commented out'
+              'GA would be loaded now but is commented out'
             )
           },
         },
@@ -137,7 +136,7 @@ const Consent2 = () => {
         },
       ],
     })
-  }, [false])
+  }, [])
 
   return [<Banner key="banner" />, <Notice key="notice" />]
 }

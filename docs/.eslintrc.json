@@ -1,15 +1,10 @@
 {
+  "root": true,
   "extends": [
     "../.eslintrc.json",
-    "plugin:react/recommended",
+    "preact",
     "plugin:jsx-a11y/recommended"
   ],
-  "settings": {
-    "react": {
-      "createClass": "createElement",
-      "pragma": "h"
-    }
-  },
   "rules": {
     "react/prop-types": "off"
   }
