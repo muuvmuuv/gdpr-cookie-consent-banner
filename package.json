@@ -26,32 +26,29 @@
   "scripts": {
     "bundle": "microbundle --name CookieConsent",
     "prepublishOnly": "pnpm run bundle",
-    "build": "preact build --src docs --preload --no-esm",
+    "build": "preact build --src docs",
     "watch": "preact watch --src docs",
     "lint": "run-p lint:*",
     "lint:docs": "eslint -c docs/.eslintrc.json --cache --cache-file docs/.eslintcache docs",
     "lint:lib": "eslint --cache lib"
   },
   "devDependencies": {
+    "@babel/plugin-syntax-optional-chaining": "^7.8.3",
+    "@babel/preset-modules": "^0.1.3",
     "babel-eslint": "^10.1.0",
     "copy-text-to-clipboard": "^2.1.1",
     "eslint": "^6.8.0",
     "eslint-config-preact": "^1.1.0",
     "eslint-config-prettier": "^6.10.0",
-    "eslint-plugin-compat": "^3.5.1",
     "eslint-plugin-import": "^2.20.1",
-    "eslint-plugin-jest": "^23.8.2",
     "eslint-plugin-jsx-a11y": "^6.2.3",
     "eslint-plugin-prettier": "^3.1.2",
-    "eslint-plugin-react": "^7.19.0",
-    "eslint-plugin-react-hooks": "^2.5.0",
-    "jest": "^25.1.0",
     "microbundle": "^0.12.0-next.8",
     "modern-normalize": "^0.6.0",
     "node-sass": "^4.13.1",
     "npm-run-all": "^4.1.5",
-    "preact": "^10.3.3",
-    "preact-cli": "^3.0.0-rc.9",
+    "preact": "^10.3.4",
+    "preact-cli": "^3.0.0-rc.10",
     "preact-render-spy": "^1.3.0",
     "preact-render-to-string": "^5.1.4",
     "preact-router": "^3.2.1",
@@ -64,6 +61,6 @@
     "stylelint-config-property-sort-order-smacss": "^6.0.0",
     "stylelint-config-recommended-scss": "^4.2.0",
     "stylelint-prettier": "^1.1.2",
-    "stylelint-scss": "^3.14.2"
+    "stylelint-scss": "^3.15.0"
   }
 }
